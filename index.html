@@ -1194,30 +1194,35 @@
     <p class="section-sub">Tell us about your stay and we'll be in touch within 24 hours to confirm every detail.</p>
 
     <form class="form-grid" onsubmit="handleSubmit(event)">
+      <!-- FormSubmit config -->
+      <input type="hidden" name="_subject" value="New Arrival Services Inquiry — Northern Michigan">
+      <input type="hidden" name="_template" value="table">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_autoresponse" value="Thank you for reaching out to Northern Michigan Arrival Services! We’ve received your inquiry and will be in touch within 24 hours to plan your perfect arrival. — Lisa Knox, northernmichigantravelguide.tips">
       <div>
         <label class="field-label">First Name</label>
-        <input type="text" class="field-input" placeholder="Lisa" required>
+        <input type="text" name="First Name" class="field-input" placeholder="Lisa" required>
       </div>
       <div>
         <label class="field-label">Last Name</label>
-        <input type="text" class="field-input" placeholder="Knox" required>
+        <input type="text" name="Last Name" class="field-input" placeholder="Knox" required>
       </div>
       <div>
         <label class="field-label">Email Address</label>
-        <input type="email" class="field-input" placeholder="you@email.com" required>
+        <input type="email" name="Email" class="field-input" placeholder="you@email.com" required>
       </div>
       <div>
         <label class="field-label">Phone Number</label>
-        <input type="tel" class="field-input" placeholder="(231) 555-0100">
+        <input type="tel" name="Phone" class="field-input" placeholder="(231) 555-0100">
       </div>
       <div>
         <label class="field-label">Arrival Date</label>
-        <input type="date" class="field-input" required>
+        <input type="date" name="Arrival Date" class="field-input" required>
       </div>
       <div>
         <label class="field-label">Group Size</label>
         <div class="select-wrap">
-          <select class="field-select">
+          <select name="Group Size" class="field-select">
             <option value="">Select size</option>
             <option>2 guests</option>
             <option>3–4 guests</option>
@@ -1229,12 +1234,12 @@
       </div>
       <div class="form-full">
         <label class="field-label">Property Location</label>
-        <input type="text" class="field-input" placeholder="Leelanau Peninsula, Old Mission, Traverse City, Petoskey..." required>
+        <input type="text" name="Property Location" class="field-input" placeholder="Leelanau Peninsula, Old Mission, Traverse City, Petoskey..." required>
       </div>
       <div class="form-full">
         <label class="field-label">Which Experience Interests You?</label>
         <div class="select-wrap">
-          <select class="field-select">
+          <select name="Experience" class="field-select">
             <option value="">Select an experience</option>
             <option>The Northern Michigan Welcome</option>
             <option>Stocked & Ready</option>
@@ -1251,7 +1256,7 @@
       </div>
       <div class="form-full">
         <label class="field-label">Tell Us About Your Vision</label>
-        <textarea class="field-textarea" placeholder="Any special occasion, dietary needs, preferences, or details we should know about..."></textarea>
+        <textarea name="Message" class="field-textarea" placeholder="Any special occasion, dietary needs, preferences, or details we should know about..."></textarea>
       </div>
       <div class="form-full" style="text-align:center;">
         <button type="submit" class="btn-submit">Request My Experience →</button>
@@ -1281,12 +1286,32 @@
     if (!isOpen) item.classList.add('open');
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    const btn = e.target.querySelector('.btn-submit');
-    btn.textContent = '✓ Request Received — We\'ll Be In Touch!';
-    btn.style.background = '#4A7A35';
+    const form = e.target;
+    const btn = form.querySelector('.btn-submit');
+    const originalText = btn.textContent;
+    btn.textContent = 'Sending…';
     btn.disabled = true;
+    try {
+      const formData = new FormData(form);
+      const response = await fetch('https://formsubmit.co/ajax/knox@northernmichigantravelguide.tips', {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      });
+      if (response.ok) {
+        btn.textContent = '✓ Request Received — We'll Be In Touch Within 24 Hours!';
+        btn.style.background = '#4A7A35';
+        form.reset();
+      } else {
+        throw new Error('Server error');
+      }
+    } catch (err) {
+      btn.textContent = originalText;
+      btn.disabled = false;
+      alert('Something went wrong. Please email us directly:\nknox@northernmichigantravelguide.tips');
+    }
   }
 
   // Smooth scroll for anchor links
